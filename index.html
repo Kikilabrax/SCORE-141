@@ -334,7 +334,7 @@
 
     // 1) Taille max (sécurité iOS) : au-delà on supprime
     // (200–400 KB est déjà beaucoup pour ce type d'app)
-    const MAX_CHARS = 250_000;
+    const MAX_CHARS = 250000;
     if (raw.length > MAX_CHARS) {
       localStorage.removeItem(SAVE_KEY);
       return;
@@ -358,7 +358,7 @@
     try { localStorage.removeItem(SAVE_KEY); } catch {}
   }
 }
-
+
 
     function flashSavedBadge() {
       const badge = $("saveBadge");
@@ -1240,7 +1240,7 @@ function restoreLast() {
   <!-- ✅ Service Worker : cache-busting + rechargement lors d'une mise à jour -->
   <script>
     (function(){
-      const SW_URL = "./sw.js?v=2026-02-07-final"; // ⬅️ incrémente à chaque déploiement
+      const SW_URL = "./sw.js?v=2026-02-08-fix-history";// ⬅️ incrémente à chaque déploiement
       if (!("serviceWorker" in navigator)) return;
 
       navigator.serviceWorker.register(SW_URL).then((reg) => {
@@ -1253,3 +1253,5 @@ function restoreLast() {
   </script>
 </body>
 </html>
+
+
