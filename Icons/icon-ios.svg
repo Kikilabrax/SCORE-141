@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Fond plein OBLIGATOIRE pour iOS -->
+  <rect width="1024" height="1024" fill="#0b3b26"/>
+
+  <defs>
+    <radialGradient id="felt" cx="35%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#1f7a4f"/>
+      <stop offset="55%" stop-color="#14623d"/>
+      <stop offset="100%" stop-color="#0b3b26"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Feutre -->
+  <rect width="1024" height="1024" rx="220" fill="url(#felt)"/>
+
+  <!-- Queue -->
+  <g transform="rotate(-18 512 512)">
+    <rect x="180" y="720" width="680" height="22" rx="11" fill="#f1f5f9"/>
+    <rect x="180" y="720" width="120" height="22" rx="11" fill="#f59e0b"/>
+  </g>
+
+  <!-- Bille -->
+  <circle cx="780" cy="260" r="80" fill="#f8fafc"/>
+  <circle cx="750" cy="230" r="14" fill="#ffffff"/>
+
+  <!-- Texte -->
+  <text x="512" y="560"
+        text-anchor="middle"
+        font-size="220"
+        font-weight="800"
+        fill="#f8fafc"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial">
+    14/1
+  </text>
+
+  <text x="512" y="650"
+        text-anchor="middle"
+        font-size="44"
+        font-weight="700"
+        letter-spacing="6"
+        fill="#d1fae5"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial">
+    SCORE
+  </text>
+</svg>
