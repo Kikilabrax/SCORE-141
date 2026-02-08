@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Score 14/1 (Straight Pool)</title>
+
+  <!-- ✅ PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+
+  <!-- ✅ iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Score 14/1">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
+
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0b1020; color: #eef2ff; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 22px; margin: 8px 0 16px; }
+
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 14px; }
+    .grid { display: grid; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    @media (min-width: 760px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    label { display: block; font-size: 12px; opacity: 0.9; margin-bottom: 6px; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.25); color: #eef2ff;
+    }
+    input:focus, select:focus { outline: 2px solid rgba(99,102,241,0.7); border-color: transparent; }
+
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      padding: 10px 12px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08); color: #eef2ff;
+      cursor: pointer; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btn:hover { background: rgba(255,255,255,0.12); }
+    .btn.primary { background: rgba(99,102,241,0.35); border-color: rgba(99,102,241,0.6); }
+    .btn.primary:hover { background: rgba(99,102,241,0.5); }
+    .btn.danger { background: rgba(239,68,68,0.25); border-color: rgba(239,68,68,0.55); }
+    .btn.danger:hover { background: rgba(239,68,68,0.35); }
+    .btn.warn { background: rgba(245,158,11,0.20); border-color: rgba(245,158,11,0.55); }
+    .btn.warn:hover { background: rgba(245,158,11,0.30); }
+    .btn.neutral { background: rgba(148,163,184,0.14); border-color: rgba(148,163,184,0.35); }
+    .btn.neutral:hover { background: rgba(148,163,184,0.22); }
+    .btn.big { padding: 12px 14px; border-radius: 14px; font-weight: 650; }
+
+    .scorebox { padding: 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.18); }
+    .name { font-size: 16px; opacity: 0.95; display:flex; justify-content:space-between; gap:12px; }
+    .bigScore { font-size: 56px; font-weight: 800; line-height: 1; margin: 8px 0 6px; }
+    .meta { font-size: 13px; opacity: 0.9; display:flex; gap:12px; flex-wrap:wrap; }
+    .pill { padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); }
+    .active { outline: 2px solid rgba(34,197,94,0.55); }
+
+    .status { margin-top: 10px; padding: 10px 12px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.22); background: rgba(0,0,0,0.12); }
+    .muted { opacity: 0.85; font-size: 13px; }
+    .history { max-height: 170px; overflow: auto; font-size: 13px; }
+    .history li { margin: 6px 0; opacity: 0.92; }
+    .footer { margin-top: 14px; font-size: 12px; opacity: 0.75; }
+    .sep { height: 1px; background: rgba(255,255,255,0.12); margin: 12px 0; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .sectionTitle { font-weight: 750; margin-bottom: 8px; opacity: .95; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.10); vertical-align: top; }
+    th { opacity: 0.9; font-weight: 800; }
+    .twrap { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.10); }
+
+    .saveBadge {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(34,197,94,0.45);
+      background: rgba(34,197,94,0.12);
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: opacity .15s ease, transform .15s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .saveBadge.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Score 14/1 — compteur de points (Straight Pool)</h1>
+
+    <div class="card grid" style="margin-bottom: 12px;">
+      <div class="grid grid-2">
+        <div>
+          <label for="p1">Joueur 1</label>
+          <input id="p1" type="text" value="Joueur A" />
+        </div>
+        <div>
+          <label for="p2">Joueur 2</label>
+          <input id="p2" type="text" value="Joueur B" />
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div>
+          <label for="target">Fin par points (objectif)</label>
+          <input id="target" type="number" min="1" step="1" value="100" />
+          <div class="muted" style="margin-top:6px;">Partie classique : 100 points.</div>
+        </div>
+        <div>
+          <label for="maxReprises">Fin par reprises (max) — <strong>par joueur</strong></label>
+          <input id="maxReprises" type="number" min="1" step="1" placeholder="Ex : 20" />
+          <div class="muted" style="margin-top:6px;">Optionnel. Si vide : pas de limite.</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div>
+          <label for="endMode">Condition de fin</label>
+          <select id="endMode">
+            <option value="points">Fin à X points</option>
+            <option value="reprises">Fin à X reprises (par joueur)</option>
+            <option value="either" selected>Fin à X points OU X reprises (par joueur)</option>
+          </select>
+        </div>
+        <div>
+          <label for="venue">Lieu / Club (PDF)</label>
+          <input id="venue" type="text" placeholder="Ex : Club de … / Salle …" />
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="row" style="align-items:flex-end;">
+          <button class="btn" id="exportPdf" type="button">Exporter PDF</button>
+          <div class="muted">Ouvre une feuille A4 → Imprimer → Enregistrer en PDF.</div>
+        </div>
+        <div class="row" style="justify-content:flex-end; align-items:flex-end;">
+          <button class="btn" id="resume" style="display:none;" type="button">Reprendre la partie</button>
+          <button class="btn" id="clearSave" style="display:none;" type="button">Effacer la sauvegarde</button>
+          <button class="btn" id="applySettings" type="button">Appliquer</button>
+          <button class="btn danger" id="reset" type="button">Nouvelle partie</button>
+        </div>
+      </div>
+
+      <div class="status" id="status">
+        <div>
+          <strong>À la table :</strong> <span id="atTable">—</span>
+          <span id="saveBadge" class="saveBadge">Sauvegardé ✓</span>
+        </div>
+        <div class="muted" id="hint">
+          Raccourcis : <span class="kbd">Espace</span>=+1, <span class="kbd">L</span>=légal(0),
+          <span class="kbd">F</span>=faute&pass, <span class="kbd">C</span>=casse&pass,
+          <span class="kbd">N</span>=switch, <span class="kbd">Ctrl+Z</span>=annuler.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom: 12px;">
+      <div class="scorebox" id="box1">
+        <div class="name">
+          <span id="name1">Joueur A</span>
+          <span class="pill" id="turn1">À la table</span>
+        </div>
+        <div class="bigScore" id="score1">0</div>
+        <div class="meta">
+          <span class="pill">Série : <strong id="run1">0</strong></span>
+          <span class="pill">Fautes consécutives : <strong id="foul1">0</strong></span>
+          <span class="pill">Reprises : <strong id="rep1">1</strong></span>
+        </div>
+      </div>
+
+      <div class="scorebox" id="box2">
+        <div class="name">
+          <span id="name2">Joueur B</span>
+          <span class="pill" id="turn2" style="opacity:.45;">À la table</span>
+        </div>
+        <div class="bigScore" id="score2">0</div>
+        <div class="meta">
+          <span class="pill">Série : <strong id="run2">0</strong></span>
+          <span class="pill">Fautes consécutives : <strong id="foul2">0</strong></span>
+          <span class="pill">Reprises : <strong id="rep2">0</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Actions “match” (1 clic)</div>
+      <div class="row" style="margin-bottom: 10px;">
+        <button class="btn primary big" id="plus1" type="button">+1 (bille empochée)</button>
+        <button class="btn neutral big" id="legal0" type="button">Coup légal (0)</button>
+        <button class="btn danger big" id="foulPass" type="button">Faute (-1) & passe la main</button>
+        <button class="btn warn big" id="breakFoulPass" type="button">Faute casse (-2) & passe la main</button>
+        <button class="btn big" id="missPass" type="button">Raté & passe la main</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="sectionTitle">Actions “détaillées”</div>
+      <div class="row" style="margin-bottom: 10px;">
+        <button class="btn" id="switch" type="button">Changement de joueur</button>
+        <button class="btn danger" id="foul" type="button">Faute (-1)</button>
+        <button class="btn warn" id="breakFoul" type="button">Faute à la casse (-2)</button>
+        <button class="btn" id="undo" type="button">Annuler</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="grid grid-2">
+        <div>
+          <div><strong>Historique</strong> <span class="muted">(pour Annuler)</span></div>
+          <ul class="history" id="history"></ul>
+        </div>
+
+        <div>
+          <div><strong>Stats</strong> <span class="muted">(moyenne officielle = points réalisés / reprises)</span></div>
+          <div class="twrap" style="margin-top:8px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Stat</th>
+                  <th id="thP1">Joueur A</th>
+                  <th id="thP2">Joueur B</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Reprises</td><td id="st_rep_1">1</td><td id="st_rep_2">0</td></tr>
+                <tr><td>Points réalisés (+1)</td><td id="st_pts_1">0</td><td id="st_pts_2">0</td></tr>
+                <tr><td><strong>Moyenne officielle</strong> (points / reprises)</td><td id="st_avg_1">0.00</td><td id="st_avg_2">0.00</td></tr>
+                <tr><td>Meilleure série (max run)</td><td id="st_bestRun_1">0</td><td id="st_bestRun_2">0</td></tr>
+                <tr><td>Fautes totales</td><td id="st_fouls_1">0</td><td id="st_fouls_2">0</td></tr>
+                <tr><td>Fautes à la casse</td><td id="st_breakFouls_1">0</td><td id="st_breakFouls_2">0</td></tr>
+                <tr><td>Pénalités -15 (3 fautes)</td><td id="st_three_1">0</td><td id="st_three_2">0</td></tr>
+                <tr><td>Total points retirés (pénalités)</td><td id="st_pen_1">0</td><td id="st_pen_2">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="muted" style="margin-top:10px;">
+            <div><strong>Rappels :</strong> +1 = bille empochée. Faute = -1. Faute à la casse = -2.</div>
+            <div>3 fautes consécutives (faute casse incluse) : -15 supplémentaires, puis compteur remis à 0.</div>
+            <div>Le compteur de fautes consécutives revient aussi à 0 sur un <strong>coup légal (0)</strong> ou sur un +1.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Export PDF : logo centré + tableau par reprise + signatures.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------
+    // Utilitaires DOM
+    // -------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+
+    function isTypingInInput() {
+      const el = document.activeElement;
+      return el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT");
+    }
+
+    function formatDateFR(d = new Date()) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function avg(points, reprises) {
+      if (!reprises || reprises <= 0) return "0.00";
+      return (points / reprises).toFixed(2);
+    }
+
+    // -------------------------------------------------------
+    // State
+    // -------------------------------------------------------
+    const state = {
+      players: ["Joueur A", "Joueur B"],
+      targetPoints: 100,
+      maxReprises: null,       // par joueur
+      endMode: "either",
+      meta: { venue: "" },
+
+      scores: [0, 0],
+      runs: [0, 0],
+      consecutiveFouls: [0, 0],
+      currentPlayer: 0,
+
+      winner: null,
+      endReason: null,         // "points" | "reprises" | null
+
+      // reprise = tour de jeu (par joueur). On stocke les reprises terminées.
+      innings: [[], []],       // [{reprise, points, fouls, endScore}]
+      currentInning: [         // reprise en cours (par joueur)
+        { reprise: 1, points: 0, fouls: 0, endScore: 0 },
+        null
+      ],
+
+      history: [],
+
+      stats: {
+        reprises: [1, 0],      // joueur 1 commence => 1 reprise entamée
+        pointsMade: [0, 0],
+        bestRun: [0, 0],
+        fouls: [0, 0],
+        breakFouls: [0, 0],
+        threeFoulPenalties: [0, 0],
+        penaltyPoints: [0, 0]
+      }
+    };
+
+    function fmtPlayer(i) { return state.players[i] || `Joueur ${i+1}`; }
+
+    // -------------------------------------------------------
+    // Sauvegarde automatique (localStorage)
+    // -------------------------------------------------------
+    const SAVE_KEY = "score141_autosave_final_v1";
+    let saveFlashTimer = null;
+    let lastFlashAt = 0;
+    let draftTimer = null;
+
+    function flashSavedBadge() {
+      const badge = $("saveBadge");
+      if (!badge) return;
+      const now = Date.now();
+      if (now - lastFlashAt < 700) return;
+      lastFlashAt = now;
+
+      badge.classList.add("show");
+      if (saveFlashTimer) clearTimeout(saveFlashTimer);
+      saveFlashTimer = setTimeout(() => badge.classList.remove("show"), 1000);
+    }
+
+    function getDraftSettingsFromDOM() {
+      return {
+        p1: $("p1").value,
+        p2: $("p2").value,
+        target: $("target").value,
+        maxReprises: $("maxReprises").value,
+        endMode: $("endMode").value,
+        venue: $("venue").value
+      };
+    }
+
+    function applyDraftToDOM(draft) {
+      if (!draft) return;
+      if (typeof draft.p1 === "string") $("p1").value = draft.p1;
+      if (typeof draft.p2 === "string") $("p2").value = draft.p2;
+      if (draft.target != null) $("target").value = String(draft.target);
+      if (draft.maxReprises != null) $("maxReprises").value = String(draft.maxReprises);
+      if (draft.endMode === "points" || draft.endMode === "reprises" || draft.endMode === "either") $("endMode").value = draft.endMode;
+      if (typeof draft.venue === "string") $("venue").value = draft.venue;
+    }
+
+    function serializeState() {
+      return {
+        version: 1,
+        savedAt: Date.now(),
+        state: state,
+        draft: getDraftSettingsFromDOM()
+      };
+    }
+
+    function applySerializedState(obj) {
+      if (!obj || !obj.state) return false;
+      const s = obj.state;
+
+      // validations minimales
+      if (!Array.isArray(s.scores) || s.scores.length !== 2) return false;
+      if (!s.stats || !Array.isArray(s.stats.reprises)) return false;
+
+      // copie profonde simple
+      const clone = JSON.parse(JSON.stringify(s));
+      Object.assign(state, clone);
+
+      applyDraftToDOM(obj.draft);
+      return true;
+    }
+
+    function saveToStorage() {
+      try {
+        state.meta.venue = $("venue").value.trim();
+        localStorage.setItem(SAVE_KEY, JSON.stringify(serializeState()));
+        updateSaveButtons();
+        flashSavedBadge();
+      } catch {}
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function clearStorageSave() {
+      try {
+        localStorage.removeItem(SAVE_KEY);
+        updateSaveButtons();
+      } catch {}
+    }
+
+    function hasSavedGame() {
+      return !!localStorage.getItem(SAVE_KEY);
+    }
+
+    function updateSaveButtons() {
+      const resumeBtn = $("resume");
+      const clearBtn = $("clearSave");
+      const show = hasSavedGame();
+      resumeBtn.style.display = show ? "inline-block" : "none";
+      clearBtn.style.display = show ? "inline-block" : "none";
+    }
+
+    function scheduleDraftSave() {
+      if (draftTimer) clearTimeout(draftTimer);
+      draftTimer = setTimeout(() => saveToStorage(), 350);
+    }
+
+    // -------------------------------------------------------
+    // Reprises (innings)
+    // -------------------------------------------------------
+    function ensureCurrentInningFor(playerIndex) {
+      if (state.currentInning[playerIndex]) return;
+      const repNo = state.stats.reprises[playerIndex];
+      state.currentInning[playerIndex] = {
+        reprise: repNo,
+        points: 0,
+        fouls: 0,
+        endScore: state.scores[playerIndex]
+      };
+    }
+
+    function closeCurrentInning(playerIndex) {
+      const inn = state.currentInning[playerIndex];
+      if (!inn) return;
+      inn.endScore = state.scores[playerIndex];
+      state.innings[playerIndex].push(inn);
+      state.currentInning[playerIndex] = null;
+    }
+
+    // -------------------------------------------------------
+    // Historique (annuler)
+    // -------------------------------------------------------
+    function snapshot(actionLabel) {
+      state.history.push(JSON.parse(JSON.stringify({
+        actionLabel,
+        state: state
+      })));
+      if (state.history.length > 200) state.history.shift();
+    }
+
+    function restoreLast() {
+      const prev = state.history.pop();
+      if (!prev) return false;
+      const restored = JSON.parse(JSON.stringify(prev.state));
+      Object.assign(state, restored);
+      syncSettingsToInputs();
+      return true;
+    }
+
+    // -------------------------------------------------------
+    // Fin de match (cas 2 : reprises par joueur)
+    // -------------------------------------------------------
+    function determineWinnerByScore() {
+      if (state.scores[0] > state.scores[1]) return 0;
+      if (state.scores[1] > state.scores[0]) return 1;
+      return -1;
+    }
+
+    function finishMatch(reason) {
+      state.endReason = reason;
+      closeCurrentInning(state.currentPlayer);
+
+      if (reason === "points") return;
+
+      const w = determineWinnerByScore();
+      state.winner = (w === -1) ? null : w;
+    }
+
+    function checkEndByPoints() {
+      const p = state.currentPlayer;
+      if (state.scores[p] >= state.targetPoints) {
+        state.winner = p;
+        finishMatch("points");
+        return true;
+      }
+      return false;
+    }
+
+    function bothReachedMaxReprises() {
+      if (state.maxReprises == null) return false;
+      return state.stats.reprises[0] >= state.maxReprises && state.stats.reprises[1] >= state.maxReprises;
+    }
+
+    // Cas 2 : rattrapage possible
+    function startNextRepriseOrEnd(nextPlayer) {
+      if (state.maxReprises == null) {
+        state.currentPlayer = nextPlayer;
+        state.stats.reprises[nextPlayer] += 1;
+        ensureCurrentInningFor(nextPlayer);
+        return;
+      }
+
+      if (state.endReason) return;
+
+      const other = 1 - nextPlayer;
+
+      if (bothReachedMaxReprises()) {
+        finishMatch("reprises");
+        return;
+      }
+
+      if (state.stats.reprises[nextPlayer] >= state.maxReprises) {
+        if (state.stats.reprises[other] < state.maxReprises) {
+          state.currentPlayer = other;
+          state.stats.reprises[other] += 1;
+          ensureCurrentInningFor(other);
+          return;
+        }
+        finishMatch("reprises");
+        return;
+      }
+
+      state.currentPlayer = nextPlayer;
+      state.stats.reprises[nextPlayer] += 1;
+      ensureCurrentInningFor(nextPlayer);
+    }
+
+    // -------------------------------------------------------
+    // Rendu UI
+    // -------------------------------------------------------
+    function setButtonsDisabled(disabled) {
+      const ids = ["plus1","legal0","foulPass","breakFoulPass","missPass","switch","foul","breakFoul"];
+      ids.forEach(id => { const el = $(id); if (el) el.disabled = disabled; });
+    }
+
+    function renderStats() {
+      $("thP1").textContent = fmtPlayer(0);
+      $("thP2").textContent = fmtPlayer(1);
+
+      $("st_rep_1").textContent = String(state.stats.reprises[0]);
+      $("st_rep_2").textContent = String(state.stats.reprises[1]);
+
+      $("st_pts_1").textContent = String(state.stats.pointsMade[0]);
+      $("st_pts_2").textContent = String(state.stats.pointsMade[1]);
+
+      $("st_avg_1").textContent = avg(state.stats.pointsMade[0], state.stats.reprises[0]);
+      $("st_avg_2").textContent = avg(state.stats.pointsMade[1], state.stats.reprises[1]);
+
+      $("st_bestRun_1").textContent = String(state.stats.bestRun[0]);
+      $("st_bestRun_2").textContent = String(state.stats.bestRun[1]);
+
+      $("st_fouls_1").textContent = String(state.stats.fouls[0]);
+      $("st_fouls_2").textContent = String(state.stats.fouls[1]);
+
+      $("st_breakFouls_1").textContent = String(state.stats.breakFouls[0]);
+      $("st_breakFouls_2").textContent = String(state.stats.breakFouls[1]);
+
+      $("st_three_1").textContent = String(state.stats.threeFoulPenalties[0]);
+      $("st_three_2").textContent = String(state.stats.threeFoulPenalties[1]);
+
+      $("st_pen_1").textContent = String(state.stats.penaltyPoints[0]);
+      $("st_pen_2").textContent = String(state.stats.penaltyPoints[1]);
+    }
+
+    function render() {
+      $("name1").textContent = fmtPlayer(0);
+      $("name2").textContent = fmtPlayer(1);
+
+      $("score1").textContent = String(state.scores[0]);
+      $("score2").textContent = String(state.scores[1]);
+
+      $("run1").textContent = String(state.runs[0]);
+      $("run2").textContent = String(state.runs[1]);
+
+      $("foul1").textContent = String(state.consecutiveFouls[0]);
+      $("foul2").textContent = String(state.consecutiveFouls[1]);
+
+      $("rep1").textContent = String(state.stats.reprises[0]);
+      $("rep2").textContent = String(state.stats.reprises[1]);
+
+      const p = state.currentPlayer;
+      $("atTable").textContent = fmtPlayer(p);
+
+      $("box1").classList.toggle("active", p === 0);
+      $("box2").classList.toggle("active", p === 1);
+      $("turn1").style.opacity = (p === 0) ? "1" : ".45";
+      $("turn2").style.opacity = (p === 1) ? "1" : ".45";
+
+      const finished = (state.endReason !== null);
+      setButtonsDisabled(finished);
+
+      if (finished) {
+        if (state.endReason === "points") {
+          $("hint").innerHTML =
+            `<strong>Match terminé :</strong> fin à ${state.targetPoints} points. Vainqueur : <strong>${fmtPlayer(state.winner)}</strong>.`;
+        } else {
+          const endTxt = `fin à ${state.maxReprises} reprises / joueur`;
+          if (state.winner === null) {
+            $("hint").innerHTML =
+              `<strong>Match terminé :</strong> ${endTxt}. <strong>Égalité</strong> (${state.scores[0]} - ${state.scores[1]}).`;
+          } else {
+            $("hint").innerHTML =
+              `<strong>Match terminé :</strong> ${endTxt}. Vainqueur au score : <strong>${fmtPlayer(state.winner)}</strong> (${state.scores[0]} - ${state.scores[1]}).`;
+          }
+        }
+      } else {
+        const pts = `${state.targetPoints} points`;
+        const reps = (state.maxReprises ? `${state.maxReprises} reprises / joueur` : "∞ reprises");
+        let cond = "";
+        if (state.endMode === "points") cond = `Fin à ${pts}.`;
+        if (state.endMode === "reprises") cond = `Fin à ${reps}.`;
+        if (state.endMode === "either") cond = `Fin à ${pts} OU ${reps}.`;
+        $("hint").innerHTML = `${cond} Raccourcis : <span class="kbd">Espace</span>, <span class="kbd">L</span>, <span class="kbd">F</span>, <span class="kbd">C</span>, <span class="kbd">N</span>, <span class="kbd">Ctrl+Z</span>.`;
+      }
+
+      const ul = $("history");
+      ul.innerHTML = "";
+      const items = state.history.slice().reverse().slice(0, 16);
+      for (const h of items) {
+        const li = document.createElement("li");
+        li.textContent = h.actionLabel;
+        ul.appendChild(li);
+      }
+      if (state.history.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "—";
+        li.style.opacity = ".6";
+        ul.appendChild(li);
+      }
+
+      renderStats();
+      saveToStorage();
+    }
+
+    function syncSettingsToInputs() {
+      $("p1").value = state.players[0];
+      $("p2").value = state.players[1];
+      $("target").value = String(state.targetPoints);
+      $("maxReprises").value = state.maxReprises == null ? "" : String(state.maxReprises);
+      $("endMode").value = state.endMode;
+      $("venue").value = state.meta.venue || "";
+    }
+
+    // -------------------------------------------------------
+    // Actions
+    // -------------------------------------------------------
+    function applySettings() {
+      const n1 = $("p1").value.trim() || "Joueur A";
+      const n2 = $("p2").value.trim() || "Joueur B";
+      const t = Number($("target").value);
+      const r = Number($("maxReprises").value);
+      const mode = $("endMode").value;
+      const venue = $("venue").value.trim();
+
+      snapshot("Réglages : noms / fin / lieu");
+
+      state.players = [n1, n2];
+      state.targetPoints = Number.isFinite(t) && t > 0 ? Math.floor(t) : 100;
+      state.maxReprises = (Number.isFinite(r) && r > 0) ? Math.floor(r) : null;
+      state.endMode = (mode === "points" || mode === "reprises" || mode === "either") ? mode : "either";
+      state.meta.venue = venue;
+
+      render();
+    }
+
+    function plusOne() {
+      if (state.endReason) return;
+      const p = state.currentPlayer;
+
+      ensureCurrentInningFor(p);
+      snapshot(`${fmtPlayer(p)} : +1`);
+
+      state.scores[p] += 1;
+      state.runs[p] += 1;
+
+      state.stats.pointsMade[p] += 1;
+      if (state.runs[p] > state.stats.bestRun[p]) state.stats.bestRun[p] = state.runs[p];
+
+      state.currentInning[p].points += 1;
+      state.currentInning[p].endScore = state.scores[p];
+
+      // ✅ reset fautes consécutives sur coup qui marque
+      state.consecutiveFouls[p] = 0;
+
+      if (state.endMode === "points" || state.endMode === "either") {
+        if (checkEndByPoints()) { render(); return; }
+      }
+
+      render();
+    }
+
+    function legalZero() {
+      if (state.endReason) return;
+      const p = state.currentPlayer;
+
+      ensureCurrentInningFor(p);
+      snapshot(`${fmtPlayer(p)} : Coup légal (0)`);
+
+      state.runs[p] = 0;
+
+      // ✅ reset fautes consécutives sur coup légal (0)
+      state.consecutiveFouls[p] = 0;
+
+      render();
+    }
+
+    function switchTurn(label = null) {
+      if (state.endReason) return;
+
+      const from = state.currentPlayer;
+      const to = 1 - from;
+
+      ensureCurrentInningFor(from);
+      snapshot(label ?? `Changement (${fmtPlayer(from)} → ${fmtPlayer(to)})`);
+
+      state.runs[from] = 0;
+
+      closeCurrentInning(from);
+
+      if ((state.endMode === "reprises" || state.endMode === "either") && bothReachedMaxReprises()) {
+        finishMatch("reprises");
+        render();
+        return;
+      }
+
+      startNextRepriseOrEnd(to);
+      render();
+    }
+
+    // Faute : -1 ; Faute à la casse : -2
+    // 3 fautes consécutives (faute casse incluse) => -15 en plus, puis compteur à 0
+    function applyFoul(typeLabel, basePenalty, autoPass) {
+      if (state.endReason) return;
+      const p = state.currentPlayer;
+
+      ensureCurrentInningFor(p);
+      snapshot(`${fmtPlayer(p)} : ${typeLabel} (-${basePenalty})${autoPass ? " & passe" : ""}`);
+
+      state.runs[p] = 0;
+      state.scores[p] -= basePenalty;
+
+      state.stats.fouls[p] += 1;
+      state.stats.penaltyPoints[p] += basePenalty;
+      if (basePenalty === 2) state.stats.breakFouls[p] += 1;
+
+      state.currentInning[p].fouls += 1;
+      state.currentInning[p].endScore = state.scores[p];
+
+      // ✅ compte dans les 3 fautes consécutives
+      state.consecutiveFouls[p] += 1;
+
+      if (state.consecutiveFouls[p] >= 3) {
+        state.scores[p] -= 15;
+        state.consecutiveFouls[p] = 0;
+
+        state.stats.threeFoulPenalties[p] += 1;
+        state.stats.penaltyPoints[p] += 15;
+
+        state.currentInning[p].endScore = state.scores[p];
+
+        const last = state.history[state.history.length - 1];
+        if (last) last.actionLabel = `${fmtPlayer(p)} : ${typeLabel} (-${basePenalty}) + 3 fautes (-15)${autoPass ? " & passe" : ""}`;
+      }
+
+      if (autoPass) {
+        const from = state.currentPlayer;
+        const to = 1 - from;
+
+        closeCurrentInning(from);
+
+        if ((state.endMode === "reprises" || state.endMode === "either") && bothReachedMaxReprises()) {
+          finishMatch("reprises");
+          render();
+          return;
+        }
+
+        startNextRepriseOrEnd(to);
+      }
+
+      render();
+    }
+
+    function missAndPass() {
+      if (state.endReason) return;
+      const from = state.currentPlayer;
+      const to = 1 - from;
+
+      ensureCurrentInningFor(from);
+      snapshot(`${fmtPlayer(from)} : Raté (0) & passe`);
+
+      state.runs[from] = 0;
+      closeCurrentInning(from);
+
+      if ((state.endMode === "reprises" || state.endMode === "either") && bothReachedMaxReprises()) {
+        finishMatch("reprises");
+        render();
+        return;
+      }
+
+      startNextRepriseOrEnd(to);
+      render();
+    }
+
+    function undo() {
+      const ok = restoreLast();
+      if (!ok) return;
+      render();
+    }
+
+    function newMatch() {
+      snapshot("Nouvelle partie");
+
+      state.players = [($("p1").value.trim() || "Joueur A"), ($("p2").value.trim() || "Joueur B")];
+      state.targetPoints = Math.max(1, Math.floor(Number($("target").value) || 100));
+      const r = Number($("maxReprises").value);
+      state.maxReprises = (Number.isFinite(r) && r > 0) ? Math.floor(r) : null;
+      state.endMode = ($("endMode").value === "points" || $("endMode").value === "reprises" || $("endMode").value === "either") ? $("endMode").value : "either";
+      state.meta.venue = $("venue").value.trim();
+
+      state.scores = [0, 0];
+      state.runs = [0, 0];
+      state.consecutiveFouls = [0, 0];
+      state.currentPlayer = 0;
+      state.winner = null;
+      state.endReason = null;
+
+      state.stats = {
+        reprises: [1, 0],
+        pointsMade: [0, 0],
+        bestRun: [0, 0],
+        fouls: [0, 0],
+        breakFouls: [0, 0],
+        threeFoulPenalties: [0, 0],
+        penaltyPoints: [0, 0]
+      };
+
+      state.innings = [[], []];
+      state.currentInning = [
+        { reprise: 1, points: 0, fouls: 0, endScore: 0 },
+        null
+      ];
+
+      state.history = [];
+
+      clearStorageSave(); // nouvelle partie => on efface la sauvegarde
+      syncSettingsToInputs();
+      ensureCurrentInningFor(0);
+      render();
+    }
+
+    // -------------------------------------------------------
+    // Export PDF (logo ABTF centré + aplati, footer déplacé, signatures centrées)
+    // -------------------------------------------------------
+    function buildRowsForPlayer(playerIndex) {
+      const rows = [];
+
+      // reprises terminées
+      if (Array.isArray(state.innings[playerIndex])) {
+        for (const r of state.innings[playerIndex]) {
+          rows.push({
+            reprise: r.reprise,
+            points: r.points || 0,
+            fouls: r.fouls || 0,
+            total: (typeof r.endScore === "number") ? r.endScore : state.scores[playerIndex],
+            moyenne: 0
+          });
+        }
+      }
+
+      // reprise en cours
+      const curr = state.currentInning[playerIndex];
+      if (!state.endReason && curr) {
+        rows.push({
+          reprise: curr.reprise,
+          points: curr.points || 0,
+          fouls: curr.fouls || 0,
+          total: state.scores[playerIndex],
+          moyenne: 0
+        });
+      }
+
+      // moyenne cumulée
+      let cumPoints = 0;
+      return rows.map((r) => {
+        cumPoints += r.points;
+        const rep = r.reprise || 0;
+        return {
+          reprise: r.reprise,
+          points: r.points,
+          fouls: r.fouls,
+          total: r.total,
+          moyenne: rep > 0 ? (cumPoints / rep) : 0
+        };
+      });
+    }
+
+    function exportPdf() {
+      try {
+        const left = buildRowsForPlayer(0);
+        const right = buildRowsForPlayer(1);
+        const maxLen = Math.max(left.length, right.length, 1);
+
+        const safe = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+        }[c]));
+
+        const venue = ($("venue")?.value || "").trim() || state.meta.venue || "";
+        const dateStr = formatDateFR(new Date());
+
+        const bestRun1 = state.stats.bestRun[0] || 0;
+        const bestRun2 = state.stats.bestRun[1] || 0;
+
+        const endTxt = state.endReason
+          ? (state.endReason === "points" ? "Fin aux points" : "Fin aux reprises")
+          : "—";
+
+        // ✅ Ouvrir tout de suite (iOS)
+        const w = window.open("", "_blank");
+        if (!w) { alert("Pop-up bloquée. Autorise les pop-ups puis réessaie."); return; }
+
+        const makeTable = (rows, playerName, idx) => {
+          const lines = [];
+          lines.push(`<div class="playerBlock">
+            <table class="t">
+              <thead>
+                <tr><th colspan="5" class="player">${safe(playerName)}</th></tr>
+                <tr>
+                  <th class="c">REPRISE</th>
+                  <th class="c">POINTS</th>
+                  <th class="c">FAUTES</th>
+                  <th class="c">TOTAL</th>
+                  <th class="c">MOYENNE</th>
+                </tr>
+              </thead>
+              <tbody>`);
+
+          for (let i = 0; i < maxLen; i++) {
+            const r = rows[i];
+            if (!r) {
+              lines.push(`<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>`);
+            } else {
+              lines.push(`<tr>
+                <td class="c">${r.reprise}</td>
+                <td class="c">${r.points}</td>
+                <td class="c">${r.fouls}</td>
+                <td class="c">${r.total}</td>
+                <td class="c">${r.moyenne.toFixed(2).replace(".", ",")}</td>
+              </tr>`);
+            }
+          }
+
+          const totalScore = state.scores[idx];
+          const pointsMade = state.stats.pointsMade[idx];
+          const reprises = state.stats.reprises[idx];
+          const avgOff = (reprises > 0 ? (pointsMade / reprises).toFixed(2) : "0.00").replace(".", ",");
+          const bestRun = state.stats.bestRun[idx] || 0;
+          const fouls = state.stats.fouls[idx];
+
+          // ✅ Footer demandé :
+          // - Série max sous POINTS
+          // - Score sur la même ligne que Fautes sous TOTAL
+          lines.push(`</tbody>
+            <tfoot>
+              <tr>
+                <td class="c"><strong>Résumé</strong></td>
+                <td class="c"><strong>Série max : ${bestRun}</strong></td>
+                <td class="c"><strong>Fautes : ${fouls}</strong></td>
+                <td class="c"><strong>Score : ${totalScore}</strong></td>
+                <td class="c"><strong>Moy : ${avgOff}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="sigWrap">
+            <div class="sig"><strong>Signature ${safe(playerName)}</strong></div>
+          </div>
+          </div>`);
+
+          return lines.join("");
+        };
+
+        const logoUrl = "./assets/logo_ABTF.png";
+
+        const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Feuille de résultat - Score 14/1</title>
+        <style>
+          @page{size:A4 portrait;margin:12mm;}
+          body{font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff;}
+          h1{margin:0;font-size:18px;}
+          .muted{color:#333;font-size:11px;}
+          .small{font-size:11px;}
+          .nowrap{white-space:nowrap;}
+
+          .header{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:10px;}
+          .logoBox{background:#fff;border:1px solid #111;border-radius:10px;padding:8px 12px;}
+          .logo{display:block;max-width:220px;max-height:80px;object-fit:contain;}
+          .title{text-align:center;}
+          .meta{font-size:12px;line-height:1.35;text-align:center;}
+
+          .topLine{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px;}
+          .box{border:1px solid #111;padding:8px 10px;}
+
+          .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+
+          .t{width:100%;border-collapse:collapse;font-size:11px;}
+          .t th,.t td{border:1px solid #111;padding:4px 6px;}
+          .player{text-align:center;font-size:12px;}
+          .c{text-align:center;}
+
+          .kpi{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px;font-size:12px;}
+          .pill{border:1px solid #111;padding:3px 8px;border-radius:999px;}
+
+          .playerBlock{break-inside:avoid;}
+          .sigWrap{display:flex;justify-content:center;margin-top:10px;}
+          .sig{border:1px solid #111;width:85%;height:70px;padding:6px 8px;font-size:12px;}
+
+          @media print{button{display:none!important}}
+        </style></head><body>
+
+        <div class="header">
+          <div class="logoBox" id="logoBox">
+            <img class="logo" id="logoImg" alt="Logo ABTF">
+          </div>
+
+          <div class="title">
+            <h1>Feuille de résultat — Score 14/1 (14/1)</h1>
+            <div class="meta">
+              <div class="nowrap"><strong>Date :</strong> ${safe(dateStr)}</div>
+              <div><strong>Lieu :</strong> ${safe(venue || "—")}</div>
+              <div class="muted">Moyenne officielle = points réalisés / reprises (pénalités exclues).</div>
+            </div>
+
+            <div class="kpi">
+              <div class="pill"><strong>${safe(state.players[0])}</strong> — Série max : <strong>${bestRun1}</strong></div>
+              <div class="pill"><strong>${safe(state.players[1])}</strong> — Série max : <strong>${bestRun2}</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="topLine">
+          <div class="box meta" style="flex:1;text-align:left;">
+            <div><strong>Score final</strong></div>
+            <div>${safe(state.players[0])} : <strong>${state.scores[0]}</strong></div>
+            <div>${safe(state.players[1])} : <strong>${state.scores[1]}</strong></div>
+            <div class="small" style="margin-top:6px;">${safe(endTxt)}</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          ${makeTable(left, state.players[0], 0)}
+          ${makeTable(right, state.players[1], 1)}
+        </div>
+
+        <div class="muted" style="margin-top:10px;text-align:center;">
+          Astuce iPhone : Partager → Imprimer → pincer (zoom) → Enregistrer en PDF.
+        </div>
+
+        <script>
+          (function(){
+            const logoUrl = ${JSON.stringify(logoUrl)};
+            const imgEl = document.getElementById('logoImg');
+            const boxEl = document.getElementById('logoBox');
+
+            function hideLogo(){
+              if (boxEl) boxEl.style.display = 'none';
+            }
+
+            function loadAndFlattenLogo(url){
+              return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                  try{
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth || img.width;
+                    c.height = img.naturalHeight || img.height;
+                    const ctx = c.getContext('2d');
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0,0,c.width,c.height);
+                    ctx.drawImage(img,0,0);
+                    resolve(c.toDataURL('image/png'));
+                  } catch(e){ reject(e); }
+                };
+                img.onerror = reject;
+                img.src = url;
+              });
+            }
+
+            loadAndFlattenLogo(logoUrl)
+              .then((dataUrl) => { if (imgEl) imgEl.src = dataUrl; })
+              .catch(() => hideLogo())
+              .finally(() => setTimeout(() => { try { window.print(); } catch(e) {} }, 350));
+          })();
+        <\/script>
+
+        </body></html>`;
+
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+      } catch (e) {
+        alert("Erreur export PDF : " + (e?.message || e));
+      }
+    }
+
+    // -------------------------------------------------------
+    // Events
+    // -------------------------------------------------------
+    document.addEventListener("keydown", (e) => {
+      if (isTypingInInput()) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        undo();
+        return;
+      }
+
+      const k = e.key.toLowerCase();
+      if (k === " " || e.code === "Space") { e.preventDefault(); plusOne(); return; }
+      if (k === "l") { legalZero(); return; }
+      if (k === "f") { applyFoul("Faute", 1, true); return; }
+      if (k === "c") { applyFoul("Faute à la casse", 2, true); return; }
+      if (k === "n") { switchTurn(); return; }
+    });
+
+    $("applySettings").addEventListener("click", applySettings);
+    $("reset").addEventListener("click", newMatch);
+    $("exportPdf").addEventListener("click", exportPdf);
+
+    $("resume").addEventListener("click", () => {
+      const saved = loadFromStorage();
+      if (saved && applySerializedState(saved)) {
+        syncSettingsToInputs();
+        ensureCurrentInningFor(state.currentPlayer);
+        render();
+      }
+    });
+
+    $("clearSave").addEventListener("click", () => clearStorageSave());
+
+    $("plus1").addEventListener("click", plusOne);
+    $("legal0").addEventListener("click", legalZero);
+    $("foulPass").addEventListener("click", () => applyFoul("Faute", 1, true));
+    $("breakFoulPass").addEventListener("click", () => applyFoul("Faute à la casse", 2, true));
+    $("missPass").addEventListener("click", missAndPass);
+
+    $("switch").addEventListener("click", () => switchTurn());
+    $("foul").addEventListener("click", () => applyFoul("Faute", 1, false));
+    $("breakFoul").addEventListener("click", () => applyFoul("Faute à la casse", 2, false));
+    $("undo").addEventListener("click", undo);
+
+    ["p1","p2","target","maxReprises","venue"].forEach(id => {
+      $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") applySettings(); });
+      $(id).addEventListener("input", scheduleDraftSave);
+      $(id).addEventListener("change", scheduleDraftSave);
+      $(id).addEventListener("blur", scheduleDraftSave);
+    });
+    $("endMode").addEventListener("change", scheduleDraftSave);
+
+    // -------------------------------------------------------
+    // Init
+    // -------------------------------------------------------
+    updateSaveButtons();
+
+    const saved = loadFromStorage();
+    if (saved && applySerializedState(saved)) {
+      syncSettingsToInputs();
+      ensureCurrentInningFor(state.currentPlayer);
+      render();
+    } else {
+      syncSettingsToInputs();
+      ensureCurrentInningFor(0);
+      render();
+    }
+  </script>
+
+  <!-- ✅ Service Worker : cache-busting + rechargement lors d'une mise à jour -->
+  <script>
+    (function(){
+      const SW_URL = "./sw.js?v=2026-02-07-final"; // ⬅️ incrémente à chaque déploiement
+      if (!("serviceWorker" in navigator)) return;
+
+      navigator.serviceWorker.register(SW_URL).then((reg) => {
+        if (reg.update) reg.update();
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          window.location.reload();
+        });
+      }).catch(() => {});
+    })();
+  </script>
+</body>
+</html>
