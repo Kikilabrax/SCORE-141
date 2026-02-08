@@ -326,6 +326,39 @@
     let saveFlashTimer = null;
     let lastFlashAt = 0;
     let draftTimer = null;
+	
+	function cleanupBadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+
+    // 1) Taille max (sécurité iOS) : au-delà on supprime
+    // (200–400 KB est déjà beaucoup pour ce type d'app)
+    const MAX_CHARS = 250_000;
+    if (raw.length > MAX_CHARS) {
+      localStorage.removeItem(SAVE_KEY);
+      return;
+    }
+
+    // 2) JSON valide ?
+    const obj = JSON.parse(raw);
+    if (!obj || typeof obj !== "object" || !obj.state) {
+      localStorage.removeItem(SAVE_KEY);
+      return;
+    }
+
+    // 3) On nettoie les champs à risque des anciennes versions
+    //    - history dans la sauvegarde => inutile et peut exploser la mémoire
+    if (obj.state && Array.isArray(obj.state.history) && obj.state.history.length > 0) {
+      obj.state.history = [];
+      localStorage.setItem(SAVE_KEY, JSON.stringify(obj));
+    }
+  } catch (e) {
+    // JSON cassé => on supprime
+    try { localStorage.removeItem(SAVE_KEY); } catch {}
+  }
+}
+
 
     function flashSavedBadge() {
       const badge = $("saveBadge");
@@ -361,13 +394,18 @@
     }
 
     function serializeState() {
-      return {
-        version: 1,
-        savedAt: Date.now(),
-        state: state,
-        draft: getDraftSettingsFromDOM()
-      };
-    }
+  // On enregistre une copie "légère" (sans history) pour éviter de grossir à l'infini
+  const stateForSave = JSON.parse(JSON.stringify(state));
+  stateForSave.history = []; // ✅ crucial : ne jamais sauvegarder l'historique
+
+  return {
+    version: 1,
+    savedAt: Date.now(),
+    state: stateForSave,
+    draft: getDraftSettingsFromDOM()
+  };
+}
+
 
     function applySerializedState(obj) {
       if (!obj || !obj.state) return false;
@@ -454,21 +492,30 @@
     // Historique (annuler)
     // -------------------------------------------------------
     function snapshot(actionLabel) {
-      state.history.push(JSON.parse(JSON.stringify({
-        actionLabel,
-        state: state
-      })));
-      if (state.history.length > 200) state.history.shift();
-    }
+  // Clone l'état actuel pour l'annulation, mais SANS l'historique (sinon explosion mémoire)
+  const snap = JSON.parse(JSON.stringify(state));
+  snap.history = []; // ✅ crucial
 
-    function restoreLast() {
-      const prev = state.history.pop();
-      if (!prev) return false;
-      const restored = JSON.parse(JSON.stringify(prev.state));
-      Object.assign(state, restored);
-      syncSettingsToInputs();
-      return true;
-    }
+  state.history.push({ actionLabel, state: snap });
+
+  // Limite d'historique plus petite pour mobile (évite gros usage mémoire)
+  if (state.history.length > 80) state.history.shift();
+}
+
+function restoreLast() {
+  const prev = state.history.pop();
+  if (!prev) return false;
+
+  const restored = JSON.parse(JSON.stringify(prev.state));
+
+  // On garde l'historique actuel (qui a déjà pop), et on restaure le reste
+  restored.history = state.history;
+
+  Object.assign(state, restored);
+  syncSettingsToInputs();
+  return true;
+}
+
 
     // -------------------------------------------------------
     // Fin de match (cas 2 : reprises par joueur)
@@ -1175,6 +1222,8 @@
     // Init
     // -------------------------------------------------------
     updateSaveButtons();
+
+	cleanupBadSave();
 
     const saved = loadFromStorage();
     if (saved && applySerializedState(saved)) {
