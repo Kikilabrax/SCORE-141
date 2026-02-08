@@ -1,5 +1,5 @@
 /* sw.js — Score 14/1 */
-const CACHE_VERSION = "score141-v2"; // ⬅️ incrémente à chaque déploiement
+const CACHE_VERSION = "score141-v3"; // ⬅️ incrémente à chaque déploiement
 const CACHE_NAME = `score141-cache-${CACHE_VERSION}`;
 
 // Fichiers essentiels à garder hors-ligne
@@ -92,3 +92,4 @@ self.addEventListener("fetch", (event) => {
     }
   })());
 });
+
